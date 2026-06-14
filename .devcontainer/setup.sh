@@ -8,12 +8,18 @@ echo " AgriSense-IPMS Codespace Setup"
 echo " Tools: Yosys, Verilator, OpenROAD"
 echo "=========================================="
 
+# Install Yosys and Verilator
+echo ""
+echo "[0/4] Installing Yosys and Verilator via apt-get..."
+sudo apt-get update
+sudo apt-get install -y yosys verilator
+
 # Verify tool availability
 echo ""
 echo "[1/4] Verifying synthesis tools..."
-yosys --version
-verilator --version 2>&1 | head -1
-openroad -version 2>/dev/null || echo "  OpenROAD: not in this image variant"
+yosys -V
+verilator --version | head -1
+openroad -version 2>/dev/null || echo "  OpenROAD: not in this image variant (will require OpenROAD-flow-scripts build)"
 
 # Install Python dependencies
 echo ""
