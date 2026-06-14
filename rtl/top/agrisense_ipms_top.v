@@ -259,6 +259,8 @@ module agrisense_ipms_top(
     wire [7:0] stress_score_raw;
 
     crop_stress_accelerator u_csa (
+        .clk(clk),
+        .rst_n(rst_n),
         .moisture(moisture),
         .leaf_temp(leaf_temp),
         .humidity(humidity),

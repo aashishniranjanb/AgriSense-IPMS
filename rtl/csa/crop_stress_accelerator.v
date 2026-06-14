@@ -1,17 +1,19 @@
 module crop_stress_accelerator(
-    input wire [7:0] moisture,
-    input wire [7:0] leaf_temp,
-    input wire [7:0] humidity,
-    input wire [7:0] air_temp,
-    input wire [7:0] light,
+    input wire        clk,
+    input wire        rst_n,
+    input wire [7:0]  moisture,
+    input wire [7:0]  leaf_temp,
+    input wire [7:0]  humidity,
+    input wire [7:0]  air_temp,
+    input wire [7:0]  light,
     
-    input wire [7:0] w_moisture,
-    input wire [7:0] w_leaftemp,
-    input wire [7:0] w_humidity,
-    input wire [7:0] w_airtemp,
-    input wire [7:0] w_light,
+    input wire [7:0]  w_moisture,
+    input wire [7:0]  w_leaftemp,
+    input wire [7:0]  w_humidity,
+    input wire [7:0]  w_airtemp,
+    input wire [7:0]  w_light,
     
-    input wire [3:0] shift_factor,
+    input wire [3:0]  shift_factor,
     
     output wire [7:0] stress_score
 );
@@ -52,12 +54,22 @@ module crop_stress_accelerator(
         .product(p_light)
     );
 
-    wire [18:0] weighted_sum_val;
-    assign weighted_sum_val = {3'b0, p_moisture} + {3'b0, p_leaftemp} + {3'b0, p_humidity} + {3'b0, p_airtemp} + {3'b0, p_light};
+    // Combinational sum of weighted products
+    wire [18:0] weighted_sum_val_comb;
+    assign weighted_sum_val_comb = {3'b0, p_moisture} + {3'b0, p_leaftemp} + {3'b0, p_humidity} + {3'b0, p_airtemp} + {3'b0, p_light};
 
-    // Instantiate range-check/normalization block
+    // One-cycle pipeline register to break the adder-tree critical path
+    reg [18:0] weighted_sum_val_reg;
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            weighted_sum_val_reg <= 19'd0;
+        else
+            weighted_sum_val_reg <= weighted_sum_val_comb;
+    end
+
+    // Instantiate range-check/normalization block using the registered sum
     normalization_unit norm_inst (
-        .weighted_sum_val(weighted_sum_val),
+        .weighted_sum_val(weighted_sum_val_reg),
         .shift_factor(shift_factor),
         .stress_score(stress_score)
     );
