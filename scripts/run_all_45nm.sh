@@ -12,14 +12,14 @@ echo "=========================================================="
 echo " Running Cadence 45nm Synthesis Flow (Genus)"
 echo "=========================================================="
 cd "$NODE_DIR/genus"
-genus -files run_synth.tcl -log genus.log -overwrite
+genus -files run_synth_45nm.tcl -log genus.log -overwrite
 
 echo ""
 echo "=========================================================="
 echo " Running Cadence 45nm Place & Route Flow (Innovus)"
 echo "=========================================================="
 cd "$NODE_DIR/innovus"
-innovus -files run_pnr.tcl -log innovus.log -overwrite
+innovus -files run_pnr_45nm.tcl -log innovus.log -overwrite
 
 echo "=========================================================="
 echo " 45nm Cadence Flow Run Complete!"

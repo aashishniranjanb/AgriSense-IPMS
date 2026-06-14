@@ -25,11 +25,11 @@ AgriSense-IPMS-Cadence/
 │   ├── constraints/
 │   │   └── constraints.sdc        # Timing constraints (50 ns / 20 MHz target)
 │   ├── genus/
-│   │   ├── setup.tcl              # Genus library & search path setup (45nm)
-│   │   └── run_synth.tcl          # Genus synthesis execution script
+│   │   ├── setup_45nm.tcl         # Genus library & search path setup (45nm)
+│   │   └── run_synth_45nm.tcl     # Genus synthesis execution script (45nm)
 │   ├── innovus/
-│   │   ├── setup.tcl              # Innovus design configuration setup (45nm)
-│   │   └── run_pnr.tcl            # Innovus place-and-route execution script
+│   │   ├── setup_45nm.tcl         # Innovus design configuration setup (45nm)
+│   │   └── run_pnr_45nm.tcl       # Innovus place-and-route execution script (45nm)
 │   ├── netlist/                   # Directory for synthesized netlists (.gitkeep)
 │   ├── outputs/                   # Directory for output GDSII/DB databases (.gitkeep)
 │   └── reports/                   # Directory for DRC/LVS/Timing reports (.gitkeep)
@@ -37,11 +37,11 @@ AgriSense-IPMS-Cadence/
 │   ├── constraints/
 │   │   └── constraints.sdc        # Timing constraints (50 ns / 20 MHz target)
 │   ├── genus/
-│   │   ├── setup.tcl              # Genus library & search path setup (90nm)
-│   │   └── run_synth.tcl          # Genus synthesis execution script
+│   │   ├── setup_90nm.tcl         # Genus library & search path setup (90nm)
+│   │   └── run_synth_90nm.tcl     # Genus synthesis execution script (90nm)
 │   ├── innovus/
-│   │   ├── setup.tcl              # Innovus design configuration setup (90nm)
-│   │   └── run_pnr.tcl            # Innovus place-and-route execution script
+│   │   ├── setup_90nm.tcl         # Innovus design configuration setup (90nm)
+│   │   └── run_pnr_90nm.tcl       # Innovus place-and-route execution script (90nm)
 │   ├── netlist/                   # Directory for synthesized netlists (.gitkeep)
 │   ├── outputs/                   # Directory for output GDSII/DB databases (.gitkeep)
 │   └── reports/                   # Directory for DRC/LVS/Timing reports (.gitkeep)
@@ -57,15 +57,17 @@ AgriSense-IPMS-Cadence/
 Because PDK files and directory layouts vary by local installation, you **must customize the PDK library paths** in the setup files before executing the flows:
 
 ### 1. Genus Synthesis Setup
-Edit `setup.tcl` under the target node's `genus/` folder (e.g. `45nm/genus/setup.tcl` or `90nm/genus/setup.tcl`):
-*   Update `library_list` to point to your actual technology library `.lib` database file (e.g. TSMC 90nm cell library or NCSU FreePDK45 library).
+Edit the setup file under the target node's `genus/` folder (e.g. `45nm/genus/setup_45nm.tcl` or `90nm/genus/setup_90nm.tcl`):
+*   Update `LIB_DIR` and `LIB_FILE` to point to your actual technology library `.lib` database file (e.g. TSMC 90nm cell library or NCSU FreePDK45 library).
 
 ### 2. Innovus Place & Route Setup
-Edit `setup.tcl` under the target node's `innovus/` folder (e.g. `45nm/innovus/setup.tcl` or `90nm/innovus/setup.tcl`):
-*   Update `library_list` to point to the P&R `.lib` database file.
-*   Update `lef_list` to point to the technology `.lef` and cell `.lef` files.
-*   Verify the power and ground pin names of the standard cell library in `run_pnr.tcl`:
-    *   By default, `run_pnr.tcl` performs global PG connections to `VDD` / `GND` for 45nm and `vdd` / `gnd` for 90nm standard cell base pins. Verify and adjust these pin names (e.g., to `VPWR` / `VGND` or `VDD` / `VSS`) to match your target library definitions.
+Edit the setup file under the target node's `innovus/` folder (e.g. `45nm/innovus/setup_45nm.tcl` or `90nm/innovus/setup_90nm.tcl`):
+*   Update `LIB_FILE` and `LEF_FILE` to point to the timing `.lib` and physical `.lef` files.
+*   Update `GDS_LAYERMAP` to point to your layermap file (e.g., `gds.map`).
+*   Verify the power and ground net names in the setup script:
+    *   `PWR_NET`: Default is `"VDD"`.
+    *   `GND_NET`: Default is `"VSS"`.
+    *   Confirm these names against the cell definitions in the `.lib` / `.lef` files.
 
 ---
 
@@ -85,15 +87,21 @@ bash scripts/run_all_90nm.sh
 
 #### Genus Synthesis:
 ```bash
-cd 45nm/genus
-genus -files run_synth.tcl
+# For 45nm node:
+genus -files 45nm/genus/run_synth_45nm.tcl -log 45nm/reports/genus.log
+
+# For 90nm node:
+genus -files 90nm/genus/run_synth_90nm.tcl -log 90nm/reports/genus.log
 ```
-Outputs (synthesized netlist and constraints) will be written to `45nm/netlist/` and `45nm/outputs/`. Synthesis area, timing, power, gate, and QoR reports will be written to `45nm/reports/`.
+Outputs (synthesized netlist and constraints) will be written to the target node's `netlist/` and `outputs/`. Synthesis reports will be written to the target node's `reports/`.
 
 #### Innovus Place & Route:
-*(Requires the Genus synthesis outputs in `45nm/netlist/` and `45nm/outputs/` to exist)*
+*(Requires the corresponding Genus synthesis outputs to exist)*
 ```bash
-cd 45nm/innovus
-innovus -files run_pnr.tcl
+# For 45nm node:
+innovus -files 45nm/innovus/run_pnr_45nm.tcl -log 45nm/reports/innovus.log
+
+# For 90nm node:
+innovus -files 90nm/innovus/run_pnr_90nm.tcl -log 90nm/reports/innovus.log
 ```
-Outputs (final GDSII database, P&R netlist, and saved design database) will be written to `45nm/outputs/`. Design DRC, LVS, and post-layout timing/power reports will be written to `45nm/reports/`.
+Outputs (final GDSII database, P&R netlist, and saved design database) will be written to the target node's `outputs/`. Design DRC, LVS, and post-layout timing/power reports will be written to `reports/`.
