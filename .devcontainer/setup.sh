@@ -8,11 +8,11 @@ echo " AgriSense-IPMS Codespace Setup"
 echo " Tools: Yosys, Verilator, OpenROAD"
 echo "=========================================="
 
-# Install Yosys and Verilator
+# Install Yosys, Verilator, and IVerilog
 echo ""
-echo "[0/4] Installing Yosys and Verilator via apt-get..."
+echo "[0/4] Installing Yosys, Verilator, and IVerilog via apt-get..."
 sudo apt-get update
-sudo apt-get install -y yosys verilator
+sudo apt-get install -y yosys verilator iverilog
 
 # Verify tool availability
 echo ""

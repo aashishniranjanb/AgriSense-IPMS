@@ -93,6 +93,9 @@ module tb_top;
 
     initial begin
         $dumpfile("tb_top.vcd");
+`ifdef DUMP_ALL
+        $dumpvars(0, uut);
+`else
         // Dump specific architecture signals as requested
         $dumpvars(0, uut.ipm_state);
         $dumpvars(0, uut.cross_flag_vector);
@@ -105,6 +108,7 @@ module tb_top;
         $dumpvars(0, uut.adc_mode_msb);
         $dumpvars(0, adc_mode_vector);
         $dumpvars(0, battery);
+`endif
 
         // Initialize Inputs
         clk = 0;
