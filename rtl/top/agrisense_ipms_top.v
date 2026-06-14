@@ -140,17 +140,15 @@ module agrisense_ipms_top(
         .status_adc_mode_msb(adc_mode_msb),
         
         .status_ipm_state(ipm_state),
-        .status_ipm_enables({1'b0, domain3_pwr_en, domain2_pwr_en, comm_en_out, u_ipm.dtree_en, u_ipm.csa_en, u_ipm.decde_en, u_ipm.sensor_en})
+        .status_ipm_enables({1'b0, domain3_pwr_en, domain2_pwr_en, comm_en_out, dtree_en, csa_en, decde_en, sensor_en})
     );
 
     // ==========================================
     // 2. IPM FSM
     // ==========================================
     
-    /* verilator lint_off UNUSEDSIGNAL */
     wire sensor_en;
     wire csa_en;
-    /* verilator lint_on UNUSEDSIGNAL */
     wire decde_en;
     wire dtree_en;
 
