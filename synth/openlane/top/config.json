@@ -1,0 +1,43 @@
+{
+    "DESIGN_NAME": "agrisense_ipms_top",
+    "VERILOG_FILES": [
+        "dir::../../../rtl/common/isolation_cell.v",
+        "dir::../../../rtl/common/reg_bus_interconnect.v",
+        "dir::../../../rtl/common/register_file.v",
+        "dir::../../../rtl/common/synchronizer.v",
+        "dir::../../../rtl/decde/ema_filter.v",
+        "dir::../../../rtl/decde/crossover_detector.v",
+        "dir::../../../rtl/decde/decde_channel.v",
+        "dir::../../../rtl/decde/fusion_unit.v",
+        "dir::../../../rtl/csa/weighted_sum.v",
+        "dir::../../../rtl/csa/normalization_unit.v",
+        "dir::../../../rtl/csa/crop_stress_accelerator.v",
+        "dir::../../../rtl/dt/decision_tree_accelerator.v",
+        "dir::../../../rtl/ipm/ipm_fsm.v",
+        "dir::../../../rtl/ipm/power_controller.v",
+        "dir::../../../rtl/ipm/wake_controller.v",
+        "dir::../../../rtl/sa_adc/sa_adc_controller.v",
+        "dir::../../../rtl/top/agrisense_ipms_top.v"
+    ],
+    "SYNTH_INCLUDES": [
+        "dir::../../../rtl/common"
+    ],
+    "CLOCK_PORT": "clk",
+    "CLOCK_PERIOD": 50.0,
+    "PDK": "sky130A",
+    "STD_CELL_LIBRARY": "sky130_fd_sc_hd",
+    "SYNTH_STRATEGY": "AREA 0",
+    "FP_CORE_UTIL": 35,
+    "PL_TARGET_DENSITY": 0.35,
+    "VDD_NETS": ["vccd1"],
+    "GND_NETS": ["vssd1"],
+    "FP_PDN_VWIDTH": 0.9,
+    "FP_PDN_HWIDTH": 0.9,
+    "FP_PDN_VOFFSET": 5,
+    "FP_PDN_HOFFSET": 5,
+    "FP_PDN_VPITCH": 40,
+    "FP_PDN_HPITCH": 40,
+    "MACRO_PLACEMENT_CFG": "",
+    "PL_MACRO_HALO": "",
+    "PL_MACRO_CHANNEL": ""
+}

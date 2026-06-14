@@ -1,4 +1,4 @@
-# run_synth.ps1 — Full Yosys block + top synthesis for Windows
+# run_synth.ps1 - Full Yosys block + top synthesis for Windows
 # Runs Yosys block synthesis for all blocks and generates Table II data
 
 $ErrorActionPreference = "Stop"
@@ -70,6 +70,7 @@ Write-Host " STEP 2: Yosys Block Synthesis"
 Write-Host "========================================"
 $Blocks = @(
     "sa_adc_controller",
+    "decde_channel",
     "fusion_unit",
     "crop_stress_accelerator",
     "decision_tree_accelerator",
@@ -108,6 +109,13 @@ foreach ($TopModule in $AllModules) {
             }
         }
         "{0,-26} | {1,-5} | {2}" -f $TopModule, $Cells, $Wires
+        
+        # Explicitly show 5x replicated channel counts for the paper
+        if ($TopModule -eq "decde_channel") {
+            $CellsX5 = [int]$Cells * 5
+            $WiresX5 = [int]$Wires * 5
+            "{0,-26} | {1,-5} | {2}" -f "decde_channel (x5)", $CellsX5, $WiresX5
+        }
     }
 }
 Write-Host "`nAll reports saved to: $ReportDir/"

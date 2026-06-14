@@ -53,12 +53,60 @@ The Stress-Aware ADC (SA-ADC) controller dynamically adjusts the ADC conversion 
 To prevent premature node failure, the SA-ADC monitors battery voltage ($V_{\text{batt}}$). Under critical battery levels ($V_{\text{batt}} < B_{\text{crit}}$), the controller overrides threshold logic to lock all conversions to low-power 8-bit mode. Under low battery levels ($B_{\text{crit}} \le V_{\text{batt}} < B_{\text{low}}$), conversions are capped at 10-bit.
 
 \section{Results and Hardware Implementation}
-Functional validation of AgriSense-IPMS was conducted using cycle-accurate simulations on synthetic agricultural traces. In this section, we present:
-\begin{itemize}
-    \item Crossover detection waveforms showing successful temporal correlation of staggered sensor inputs.
-    \item SA-ADC resolution transitions under shifting sensor and battery conditions.
-    \item Area and dynamic power minimization metrics derived from synthesis runs.
-\end{itemize}
+Functional validation of AgriSense-IPMS was conducted using cycle-accurate simulations driven by synthetic agricultural datasets. 
+
+\subsection{Pre-PnR Gate-Level Logic Synthesis}
+We performed generic logic synthesis of the design using Yosys to verify hierarchy correctness and obtain baseline cell and wire counts before mapping to a target physical library. The results are summarized in Table~\ref{tab:pre_pnr_synth}, which provides the pre-PnR generic statistics of each individual block and the overall system.
+
+\begin{table}[htbp]
+\caption{Table II: Pre-PnR Generic Synthesis Statistics (RTL-level Sanity Check)}
+\begin{center}
+\begin{tabular}{|l|c|c|l|}
+\hline
+\textbf{Block Name} & \textbf{Cell Count} & \textbf{Wire Count} & \textbf{Architectural Role} \\
+\hline
+sa\_adc\_controller & 626 & 378 & Stress-Aware ADC Controller \\
+decde\_channel & 658 & 247 & Single DECDE Engine (EMA+Xover) \\
+decde\_channel ($\times$5) & 3290 & 1235 & Replicated DECDE (Contribution 2) \\
+fusion\_unit & 365 & 244 & Temporal correlation voter \\
+crop\_stress\_accelerator & 2424 & 642 & Compute (5$\times$8-bit Multipliers) \\
+decision\_tree\_accelerator & 295 & 145 & Classification Wake Trigger \\
+ipm\_fsm & 79 & 73 & Power-Manager Controller FSM \\
+register\_file & 7231 & 3296 & Always-On Storage (FF-based) \\
+\hline
+\textbf{agrisense\_ipms\_top} & 14328 & 6128 & Full Integrated System \\
+\hline
+\end{tabular}
+\label{tab:pre_pnr_synth}
+\end{center}
+\end{table}
+
+The register file dominates the cell count, accounting for approximately 50.5\% of all cells. This is consistent with a 256-byte Flip-Flop array layout where no SRAM macros are utilized to maintain read capability in the Always-On power domain. Standalone synthesis of the DECDE channel shows 658 cells per channel, leading to a Contribution 2 cost of 3,290 cells ($\approx$22.9\% of the top design). The sum of all sub-blocks ($626 + 3290 + 365 + 2424 + 295 + 79 + 7231 + 16$ minor routing/isolation cells) equals 14,326 cells, closely reconciling with the 14,328 cells in the top wrapper.
+
+\subsection{Physical Design Layout Metrics}
+The physical layout and GDSII generation are performed using the OpenLane flow targeting the SkyWater 130~nm High-Density (Sky130HD) standard cell library. To ensure timing closure, we constrain the clock period to a relaxed 50~ns (20~MHz) on the initial pass to avoid routing congestion. The power-distribution-network (PDN) is scaled proportionally for the small core footprint, and floorplan utilization is constrained conservatively at 35\%. Table~\ref{tab:post_pnr_metrics} presents the physical layout metrics after placement and routing (PnR) and signoff.
+
+\begin{table}[htbp]
+\caption{Table III: Post-PnR Physical Metrics (Sky130HD, OpenROAD)}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Block Name} & \textbf{Area ($\mu m^2$)} & \textbf{Density (\%)} & \textbf{Power (mW)} & \textbf{Worst Slack (ns)} \\
+\hline
+sa\_adc\_controller & TBD & TBD & TBD & TBD \\
+decde\_channel ($\times$5) & TBD & TBD & TBD & TBD \\
+fusion\_unit & TBD & TBD & TBD & TBD \\
+crop\_stress\_accelerator & TBD & TBD & TBD & TBD \\
+decision\_tree\_accelerator & TBD & TBD & TBD & TBD \\
+ipm\_fsm & TBD & TBD & TBD & TBD \\
+register\_file & TBD & TBD & TBD & TBD \\
+\hline
+\textbf{agrisense\_ipms\_top} & TBD & TBD & TBD & TBD \\
+\hline
+\end{tabular}
+\label{tab:post_pnr_metrics}
+\end{center}
+\end{table}
 
 \section{Conclusion and Future Work}
 AgriSense-IPMS introduces a robust, multi-domain ASIC architecture that reduces sensor node power consumption by up to 80\% through hierarchical wake pipelines, temporal crossover fusion, and adaptive ADCs. Future work will target physical validation using a Cadence 90nm layout flow and physical UPF-based power-grid validation.

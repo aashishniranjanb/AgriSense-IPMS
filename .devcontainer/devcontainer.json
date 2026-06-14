@@ -1,5 +1,5 @@
 {
-  "name": "AgriSense-IPMS — OpenROAD Synthesis Environment",
+  "name": "AgriSense-IPMS - OpenROAD Synthesis Environment",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
   "features": {
     "ghcr.io/devcontainers/features/python:1": {

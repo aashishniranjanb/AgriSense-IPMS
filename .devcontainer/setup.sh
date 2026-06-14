@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# setup.sh — AgriSense-IPMS Codespaces post-create setup
+# setup.sh - AgriSense-IPMS Codespaces post-create setup
 # Runs inside ghcr.io/yosyshq/oss-cad-suite container
 
 set -e
@@ -54,7 +54,7 @@ verilator --lint-only -Wall --top-module agrisense_ipms_top \
   rtl/sa_adc/sa_adc_controller.v \
   rtl/top/agrisense_ipms_top.v \
   && echo "  Verilator: PASS (0 warnings)" \
-  || echo "  Verilator: WARNINGS FOUND — check output above"
+  || echo "  Verilator: WARNINGS FOUND - check output above"
 
 echo ""
 echo "=========================================="

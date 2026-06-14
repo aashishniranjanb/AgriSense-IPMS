@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run_synth.sh — Full OpenROAD block + top synthesis
+# run_synth.sh - Full OpenROAD block + top synthesis
 # Run inside GitHub Codespaces (oss-cad-suite container)
 # Produces Table II data for the paper
 
@@ -56,7 +56,7 @@ echo "========================================"
 verilator --lint-only -Wall --top-module agrisense_ipms_top \
   $INCLUDE "${RTL_FILES[@]}" \
   && echo "VERILATOR: PASS" \
-  || { echo "VERILATOR: FAIL — fix warnings before synthesis"; exit 1; }
+  || { echo "VERILATOR: FAIL - fix warnings before synthesis"; exit 1; }
 
 # ============================================================
 # Step 2: Yosys hierarchy check + stat (no PDK, just gates)
@@ -67,6 +67,7 @@ echo " STEP 2: Yosys Block Synthesis"
 echo "========================================"
 
 synth_block "sa_adc_controller"
+synth_block "decde_channel"
 synth_block "fusion_unit"
 synth_block "crop_stress_accelerator"
 synth_block "decision_tree_accelerator"
@@ -87,17 +88,24 @@ synth_block "agrisense_ipms_top"
 # ============================================================
 echo ""
 echo "========================================"
-echo " SYNTHESIS SUMMARY — Table II Data"
+echo " SYNTHESIS SUMMARY - Table II Data"
 echo "========================================"
 echo " Block                     | Cells | Wires"
 echo "---------------------------|-------|------"
-for TOP in sa_adc_controller fusion_unit crop_stress_accelerator \
+for TOP in sa_adc_controller decde_channel fusion_unit crop_stress_accelerator \
            decision_tree_accelerator ipm_fsm register_file agrisense_ipms_top; do
   REPORT="$REPORT_DIR/${TOP}_synth.rpt"
   if [[ -f "$REPORT" ]]; then
-    CELLS=$(grep "Number of cells:" "$REPORT" | tail -1 | awk '{print $NF}')
-    WIRES=$(grep "Number of wires:" "$REPORT" | tail -1 | awk '{print $NF}')
+    # Match both standard stat and mapped stat output formats
+    CELLS=$(grep -E "(Number of cells:|cells)" "$REPORT" | tail -1 | tr -d -c '0-9')
+    WIRES=$(grep -E "(Number of wires:|wires)" "$REPORT" | tail -1 | tr -d -c '0-9')
     printf " %-26s | %-5s | %s\n" "$TOP" "${CELLS:-N/A}" "${WIRES:-N/A}"
+    
+    if [[ "$TOP" == "decde_channel" ]]; then
+      CELLS_X5=$((CELLS * 5))
+      WIRES_X5=$((WIRES * 5))
+      printf " %-26s | %-5s | %s\n" "decde_channel (x5)" "$CELLS_X5" "$WIRES_X5"
+    fi
   fi
 done
 

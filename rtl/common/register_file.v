@@ -79,7 +79,7 @@ module register_file(
 );
 
     // 256 x 8-bit registers (Always-On Domain Storage)
-    reg [7:0] reg_mem [0:255];
+    (* ram_style = "registers" *) reg [7:0] reg_mem [0:255];
 
     integer i;
 

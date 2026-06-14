@@ -16,11 +16,16 @@ This document details the validation strategy, test datasets, and evaluation met
 
 ### Stage B: Synthesis-Level Validation (OpenROAD / Sky130)
 *   **Objective:** Synthesize the design to evaluate timing, area, and dynamic power under physical gates.
+*   **Physical Design Constraints (v1.0):**
+    *   **No SRAM Macros:** The `history_sram` is left unwired (bypassed) for this phase. Standard cell mapping only; no OpenRAM integration or macro hardening is configured.
+    *   **Single Power Domain:** Power gating of Domain 2 and Domain 3 is achieved behaviorally via operand isolation/input-gating gates (instantiated in `isolation_cell.v` using standard logic gates). The layout is executed as a single-voltage, single-power-domain GDSII without level-shifters or UPF configuration.
+    *   **Relaxed Clock Period:** We start with a relaxed 50 ns (20 MHz) clock constraint for the initial layout run to avoid routing congestion and Magic DRC violations. Sweeps of `CLOCK_PERIOD` will be performed post-PnR to determine the true achievable $F_{max}$.
+    *   **Conservative Floorplan Floor Utilization:** Floorplan core utilization is set conservatively to 35% with matching `PL_TARGET_DENSITY` to satisfy I/O pin pitch limitations around the small core boundary.
 *   **Flow:**
     1.  Compile Verilog RTL using Yosys through the OpenLane/OpenROAD flow.
     2.  Generate gate-level netlists.
     3.  Run static timing analysis (STA) to confirm zero setup/hold slack violations.
-    4.  Utilize activity-driven power reports (.vcd fed into OpenROAD) to verify the dynamic power savings achieved by input-gating Domain 2 and Domain 3.
+    4.  Utilize activity-driven power reports (VCD traces from gate-level simulation fed into OpenROAD's `report_power`) to verify the dynamic power savings achieved by input-gating Domain 2 and Domain 3.
 
 ### Stage C: Tapeout-Ready Validation (Cadence 90nm SS PDK)
 *   **Objective:** Verify post-layout timing and physical constraints.

@@ -51,6 +51,7 @@ obj_dir/
 *.blif
 *.aig
 synth/**/*.json
+!synth/**/config.json
 runs/
 results/
 *.ys
