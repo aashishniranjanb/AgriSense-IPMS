@@ -1,0 +1,15 @@
+# Cadence Genus and Innovus execution logs and commands
+*.log
+*.cmd
+genus.log*
+innovus.log*
+genus.cmd*
+innovus.cmd*
+
+# Tool databases and temporary files
+fv/
+innovus_log/
+.cadence/
+.innovus/
+*.db
+*.gds
