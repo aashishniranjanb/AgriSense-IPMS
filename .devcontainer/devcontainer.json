@@ -1,0 +1,29 @@
+{
+  "name": "AgriSense-IPMS — OpenROAD Synthesis Environment",
+  "image": "ghcr.io/yosyshq/oss-cad-suite:2024-11-01",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mshr-h.veriloghdl",
+        "ms-python.python",
+        "streetsidesoftware.code-spell-checker",
+        "mhutchie.git-graph"
+      ],
+      "settings": {
+        "verilog.linting.linter": "verilator",
+        "verilog.linting.verilator.arguments": "--lint-only -Wall +incdir+rtl/common",
+        "editor.tabSize": 4,
+        "editor.rulers": [80, 100]
+      }
+    }
+  },
+  "mounts": [],
+  "forwardPorts": [],
+  "remoteUser": "root"
+}

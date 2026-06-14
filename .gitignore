@@ -1,0 +1,89 @@
+# AgriSense-IPMS — Synthesis-Clean .gitignore
+# Excludes all Vivado simulation artifacts, cache, and IDE files.
+
+# ============================================================
+# Vivado Simulation Artifacts (root level)
+# ============================================================
+*.jou
+*.log
+*.pb
+*.vcd
+*.wdb
+*.wdf
+*.lnx
+xelab.*
+xvlog.*
+xsim.*
+*.backup.jou
+*.backup.log
+xsim.dir/
+xsim_*.backup.*
+
+# ============================================================
+# Vivado Project / Cache
+# ============================================================
+*.xpr
+*.xsa
+*.bit
+*.runs/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.srcs/
+*.sim/
+*.Xil/
+*.str
+*.ltx
+.Xil/
+vivado*.jou
+vivado*.log
+
+# ============================================================
+# Verilator Build Artifacts
+# ============================================================
+obj_dir/
+*.mk
+*.d
+
+# ============================================================
+# OpenROAD / Yosys Build Artifacts
+# ============================================================
+*.blif
+*.aig
+synth/**/*.json
+runs/
+results/
+*.ys
+logs/
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# ============================================================
+# OS / Editor Junk
+# ============================================================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/settings.json
+
+# ============================================================
+# Paper Build Artifacts (LaTeX)
+# ============================================================
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.out
+paper/*.synctex.gz
+paper/*.pdf

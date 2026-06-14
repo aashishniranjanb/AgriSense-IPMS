@@ -1,0 +1,27 @@
+# .gitattributes — normalize line endings for cross-platform use
+* text=auto
+
+# RTL — preserve LF
+*.v text eol=lf
+*.vh text eol=lf
+
+# Scripts — must be LF on Linux/Mac (Codespaces/OpenROAD)
+*.sh text eol=lf
+*.py text eol=lf
+*.tcl text eol=lf
+
+# Documentation / text — CRLF on Windows, LF elsewhere
+*.md text eol=lf
+*.txt text eol=lf
+*.tex text eol=lf
+*.bib text eol=lf
+
+# CSV traces — keep LF
+*.csv text eol=lf
+
+# JSON
+*.json text eol=lf
+
+# Binary files — don't touch
+*.wdb binary
+*.vcd binary

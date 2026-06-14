@@ -6,7 +6,7 @@ module tb_ipm_fsm;
     reg rst_n;
     reg wake_timer;
     reg stress_event;
-    reg [1:0] leaf_output;
+    reg [3:0] leaf_output;
 
     wire [1:0] state;
     wire domain2_pwr_en;
@@ -54,7 +54,7 @@ module tb_ipm_fsm;
         rst_n = 0;
         wake_timer = 0;
         stress_event = 0;
-        leaf_output = 2'b00;
+        leaf_output = 4'b0100; // Initialize to low/warning severity so we don't immediately fall back to MONITOR
 
         $display("\n=== IPM FSM State Transition Test ===");
         
@@ -64,39 +64,55 @@ module tb_ipm_fsm;
                  $time, state_str(state), domain2_pwr_en, domain3_pwr_en, sensor_en, decde_en, csa_en, dtree_en, comm_en);
 
         // 1. SLEEP -> MONITOR
-        @(posedge clk); wake_timer = 1'b1;
-        @(posedge clk); wake_timer = 1'b0;
+        @(posedge clk); #1; wake_timer = 1'b1;
+        @(posedge clk); #1; wake_timer = 1'b0;
         #10;
         $display("[%0t] wake_timer -> State: %s | D2:%b D3:%b | S:%b DEC:%b CSA:%b DT:%b COM:%b", 
                  $time, state_str(state), domain2_pwr_en, domain3_pwr_en, sensor_en, decde_en, csa_en, dtree_en, comm_en);
 
         // 2. MONITOR -> WARNING
-        @(posedge clk); stress_event = 1'b1;
-        @(posedge clk); stress_event = 1'b0;
+        @(posedge clk); #1; stress_event = 1'b1;
+        @(posedge clk); #1; stress_event = 1'b0;
         #10;
         $display("[%0t] stress_event -> State: %s | D2:%b D3:%b | S:%b DEC:%b CSA:%b DT:%b COM:%b", 
                  $time, state_str(state), domain2_pwr_en, domain3_pwr_en, sensor_en, decde_en, csa_en, dtree_en, comm_en);
 
         // 3. WARNING -> CRITICAL
-        @(posedge clk); leaf_output = 2'b10; // CRITICAL
+        @(posedge clk); #1; leaf_output = 4'b1100; // CRITICAL
         @(posedge clk); 
         #10;
         $display("[%0t] leaf_output=CRITICAL -> State: %s | D2:%b D3:%b | S:%b DEC:%b CSA:%b DT:%b COM:%b", 
                  $time, state_str(state), domain2_pwr_en, domain3_pwr_en, sensor_en, decde_en, csa_en, dtree_en, comm_en);
 
         // 4. CRITICAL -> WARNING
-        @(posedge clk); leaf_output = 2'b01; // WARNING
+        @(posedge clk); #1; leaf_output = 4'b0100; // WARNING/LOW
         @(posedge clk); 
         #10;
         $display("[%0t] leaf_output=WARNING -> State: %s | D2:%b D3:%b | S:%b DEC:%b CSA:%b DT:%b COM:%b", 
                  $time, state_str(state), domain2_pwr_en, domain3_pwr_en, sensor_en, decde_en, csa_en, dtree_en, comm_en);
 
         // 5. WARNING -> MONITOR
-        @(posedge clk); leaf_output = 2'b00; // NORMAL
-        @(posedge clk); 
-        #10;
-        $display("[%0t] leaf_output=NORMAL -> State: %s | D2:%b D3:%b | S:%b DEC:%b CSA:%b DT:%b COM:%b", 
-                 $time, state_str(state), domain2_pwr_en, domain3_pwr_en, sensor_en, decde_en, csa_en, dtree_en, comm_en);
+        @(posedge clk); #1; leaf_output = 4'b0000; // NORMAL
+        
+        // Wait 1 cycle (10 ns) - state should still be WARNING due to hysteresis!
+        @(posedge clk);
+        #1;
+        $display("[%0t] leaf_output=NORMAL (1st Cycle) -> State: %s (Expected: WARNING) | exit_ctr: %d", 
+                 $time, state_str(state), dut.exit_ctr);
+        if (state !== `IPM_WARNING) begin
+            $display("ERROR: Left WARNING immediately!");
+            $finish;
+        end
+
+        // Wait another cycle (10 ns) - state should now transition to MONITOR!
+        @(posedge clk);
+        #1;
+        $display("[%0t] leaf_output=NORMAL (2nd Cycle) -> State: %s (Expected: MONITOR) | exit_ctr: %d", 
+                 $time, state_str(state), dut.exit_ctr);
+        if (state !== `IPM_MONITOR) begin
+            $display("ERROR: Failed to transition to MONITOR after 2 cycles!");
+            $finish;
+        end
 
         #50;
         $display("\nIPM FSM Test Complete.\n");

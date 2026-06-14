@@ -1,0 +1,36 @@
+# OpenROAD RTL Freeze — Copy List
+# These are the EXACT files to copy into the openroad_freeze/ directory.
+# Files are frozen at RTL v1.0.
+# DO NOT modify these files after tag: rtl_v1_0_freeze
+
+COMMON:
+  rtl/common/agrisense_defs.vh
+  rtl/common/isolation_cell.v
+  rtl/common/reg_bus_interconnect.v
+  rtl/common/register_file.v
+  rtl/common/synchronizer.v
+
+DOMAIN 1 — DECDE:
+  rtl/decde/ema_filter.v
+  rtl/decde/crossover_detector.v
+  rtl/decde/decde_channel.v
+  rtl/decde/fusion_unit.v
+
+DOMAIN 2 — CSA:
+  rtl/csa/weighted_sum.v
+  rtl/csa/normalization_unit.v
+  rtl/csa/crop_stress_accelerator.v
+
+DOMAIN 2 — Decision Tree:
+  rtl/dt/decision_tree_accelerator.v
+
+DOMAIN 2 — SA-ADC:
+  rtl/sa_adc/sa_adc_controller.v
+
+IPM (Always-On):
+  rtl/ipm/ipm_fsm.v
+  rtl/ipm/power_controller.v
+  rtl/ipm/wake_controller.v
+
+TOP LEVEL:
+  rtl/top/agrisense_ipms_top.v
