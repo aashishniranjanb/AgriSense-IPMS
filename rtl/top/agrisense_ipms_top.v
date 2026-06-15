@@ -86,6 +86,11 @@ module agrisense_ipms_top(
     wire [2:0] fusion_score;
     wire       stress_event;
     
+    wire sensor_en;
+    wire csa_en;
+    wire decde_en;
+    wire dtree_en;
+    
     register_file u_reg_file (
         .clk(clk),
         .rst_n(rst_n),
@@ -147,11 +152,6 @@ module agrisense_ipms_top(
     // 2. IPM FSM
     // ==========================================
     
-    wire sensor_en;
-    wire csa_en;
-    wire decde_en;
-    wire dtree_en;
-
     ipm_fsm u_ipm (
         .clk(clk),
         .rst_n(rst_n),
