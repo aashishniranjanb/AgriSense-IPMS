@@ -80,7 +80,7 @@ module tb_fusion_waveform;
             sample_valid = 1;
             @(posedge clk);
             sample_valid = 0;
-            repeat(10) @(posedge clk); // Allow time for filters to compute
+            repeat(2) @(posedge clk); // Allow time for filters to compute (3 cycles total per sample)
         end
     endtask
 
@@ -107,8 +107,10 @@ module tb_fusion_waveform;
         $dumpvars(0, uut.u_decde_2.slow_ema);
         $dumpvars(0, uut.u_decde_2.cross_flag);
         
-        // Fusion Unit outputs
+        // Fusion Unit internals and outputs
         $dumpvars(0, uut.cross_flag_vector);
+        $dumpvars(0, uut.u_fusion.recent_cross);
+        $dumpvars(0, uut.u_fusion.qualified_cross);
         $dumpvars(0, uut.u_fusion.fusion_score);
         $dumpvars(0, uut.stress_event);
 
@@ -148,9 +150,9 @@ module tb_fusion_waveform;
         reg_write(8'h23, 8'd2);
         reg_write(8'h24, 8'd2);
 
-        // Fusion config: threshold = 2, window = 8
+        // Fusion config: threshold = 2, window = 15 (max for 4-bit window counter)
         reg_write(8'h52, 8'd2); 
-        reg_write(8'h51, 8'd8);
+        reg_write(8'h51, 8'd15);
 
         // Pattern config: all 0 (Don't Care, triggers on any transition)
         reg_write(8'h55, 8'h00);
@@ -169,17 +171,15 @@ module tb_fusion_waveform;
         send_sample(8'd80, 8'd70, 8'd60);
         send_sample(8'd80, 8'd70, 8'd60);
 
-        // Step 1: Moisture Stress Event (sudden increase)
+        // Step 1: Moisture Stress Event (sudden increase) -> Crossover triggers moisture channel
         $display("Driving Moisture Stress...");
-        send_sample(8'd140, 8'd70, 8'd60); // Sudden jump causing EMA crossover
-        send_sample(8'd140, 8'd70, 8'd60);
+        send_sample(8'd140, 8'd70, 8'd60); 
 
-        // Step 2: Temperature Stress Event (lagged crossover)
+        // Step 2: Temperature Stress Event (lagged crossover, sent 1 sample interval later) -> Crossover triggers temp channel
         $display("Driving Temperature Stress...");
-        send_sample(8'd140, 8'd130, 8'd60); // Sudden jump in temperature
-        send_sample(8'd140, 8'd130, 8'd60);
+        send_sample(8'd140, 8'd130, 8'd60); 
 
-        // Step 3: Observe Fusion Alert
+        // Step 3: Observe Fusion Alert (both crossovers are now overlapping inside the window!)
         $display("Observing Fusion Alert...");
         send_sample(8'd140, 8'd130, 8'd60);
         send_sample(8'd140, 8'd130, 8'd60);
